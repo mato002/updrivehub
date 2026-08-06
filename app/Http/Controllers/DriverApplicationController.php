@@ -17,11 +17,14 @@ class DriverApplicationController extends Controller
 {
     public function create(): View
     {
+        $backgrounds = config('recruitment.backgrounds', []);
+
         return view('applications.create', [
             'vehicleTypes' => config('recruitment.vehicle_types'),
             'licenceClasses' => config('recruitment.licence_classes'),
             'counties' => config('recruitment.kenya_counties'),
             'companyName' => config('recruitment.company_name'),
+            'backgroundImage' => $backgrounds ? $backgrounds[array_rand($backgrounds)] : null,
         ]);
     }
 

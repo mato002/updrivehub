@@ -12,14 +12,15 @@
     @endif
     @stack('head')
 </head>
+@php($hasHeroSection = $__env->hasSection('hero'))
 <body @class([
     'min-h-screen flex flex-col',
-    'form-page-bg' => View::hasSection('hero'),
+    'form-page-bg' => $hasHeroSection,
 ])>
     <header @class([
         'sticky top-0 z-40 border-b',
-        'glass-header' => View::hasSection('hero'),
-        'border-slate-200 bg-white/95 backdrop-blur' => ! View::hasSection('hero'),
+        'glass-header' => $hasHeroSection,
+        'border-slate-200 bg-white/95 backdrop-blur' => ! $hasHeroSection,
     ])>
         <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
             <a href="{{ route('home') }}" class="flex items-center gap-3">
@@ -48,8 +49,8 @@
 
     <footer @class([
         'border-t',
-        'glass-footer' => View::hasSection('hero'),
-        'border-slate-200 bg-white' => ! View::hasSection('hero'),
+        'glass-footer' => $hasHeroSection,
+        'border-slate-200 bg-white' => ! $hasHeroSection,
     ])>
         <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

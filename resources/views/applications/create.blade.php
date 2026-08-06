@@ -4,11 +4,13 @@
 @section('hero', true)
 
 @push('head')
+@if ($backgroundImage)
 <style>
     :root {
-        --form-bg-image: url('{{ config('recruitment.backgrounds')[array_rand(config('recruitment.backgrounds'))] }}');
+        --form-bg-image: url('{{ $backgroundImage }}');
     }
 </style>
+@endif
 @endpush
 
 @php
