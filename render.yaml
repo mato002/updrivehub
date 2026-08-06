@@ -33,15 +33,15 @@ services:
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST
-        sync: false
+        value: smtp-relay.brevo.com
       - key: MAIL_PORT
         value: "587"
+      - key: MAIL_SCHEME
+        value: tls
       - key: MAIL_USERNAME
         sync: false
       - key: MAIL_PASSWORD
         sync: false
-      - key: MAIL_ENCRYPTION
-        value: tls
       - key: MAIL_FROM_ADDRESS
         sync: false
       - key: MAIL_FROM_NAME

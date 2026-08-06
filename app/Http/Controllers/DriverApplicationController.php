@@ -10,6 +10,7 @@ use App\Services\DocumentStorageService;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
@@ -76,8 +77,7 @@ class DriverApplicationController extends Controller
             ]);
         });
 
-        Mail::to(config('recruitment.hr_email'))->send(new HrApplicationNotification($application));
-        Mail::to($application->email)->send(new ApplicantConfirmation($application));
+        $this->sendApplicationEmails($application);
 
         return redirect()
             ->route('applications.success', ['reference' => $application->reference_number])
@@ -90,5 +90,28 @@ class DriverApplicationController extends Controller
             'referenceNumber' => $reference,
             'companyName' => config('recruitment.company_name'),
         ]);
+    }
+
+    private function sendApplicationEmails(DriverApplication $application): void
+    {
+        try {
+            Mail::to(config('recruitment.hr_email'))->send(new HrApplicationNotification($application));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send HR application notification.', [
+                'application_id' => $application->id,
+                'reference' => $application->reference_number,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            Mail::to($application->email)->send(new ApplicantConfirmation($application));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send applicant confirmation email.', [
+                'application_id' => $application->id,
+                'reference' => $application->reference_number,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
