@@ -14,6 +14,12 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j$(nproc) pdo pdo_mysql pdo_pgsql zip gd bcmath \
     && rm -rf /var/lib/apt/lists/*
 
+RUN echo "upload_max_filesize=1024M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size=10240M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_execution_time=600" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_input_time=600" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "memory_limit=512M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \

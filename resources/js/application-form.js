@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const careerCounter = document.getElementById('career-counter');
     const loadingOverlay = document.getElementById('loading-overlay');
 
+    const maxUploadBytes = parseInt(form.dataset.maxUploadBytes, 10) || (1024 * 1024 * 1024);
+    const maxUploadLabel = form.dataset.maxUploadLabel || '1 GB';
+
     const stepTitles = [
         { title: 'Personal Details', icon: 'fa-user' },
         { title: 'Driving Information', icon: 'fa-id-card' },
@@ -361,11 +364,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = input.files[0];
         if (!file) return;
 
-        const maxSize = 5 * 1024 * 1024;
+        const maxSize = maxUploadBytes;
         const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
         if (file.size > maxSize) {
-            showFieldError(input, 'File must not exceed 5 MB.');
+            showFieldError(input, `File must not exceed ${maxUploadLabel}.`);
             input.value = '';
             return;
         }

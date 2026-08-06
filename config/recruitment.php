@@ -12,7 +12,7 @@ return [
 
     'address' => env('RECRUITMENT_ADDRESS', 'Nairobi, Kenya'),
 
-    'max_upload_size_kb' => 5120,
+    'max_upload_size_kb' => (int) env('RECRUITMENT_MAX_UPLOAD_SIZE_KB', 1048576),
 
     'allowed_mimes' => ['pdf', 'jpg', 'jpeg', 'png'],
 

@@ -98,6 +98,8 @@ class StoreDriverApplicationRequest extends FormRequest
 
     public function messages(): array
     {
+        $maxLabel = $this->maxUploadLabel();
+
         return [
             'date_of_birth.before' => 'You must be at least 18 years old to apply.',
             'licence_expiry_date.after' => 'Your driving licence must not be expired.',
@@ -105,9 +107,26 @@ class StoreDriverApplicationRequest extends FormRequest
             'vehicle_types.min' => 'Please select at least one vehicle type you have driven.',
             'driving_career.min' => 'Please provide at least 50 characters about your driving career.',
             'declaration.accepted' => 'You must accept the declaration to submit your application.',
-            '*.max' => 'Each file must not exceed 5 MB.',
+            '*.max' => "Each file must not exceed {$maxLabel}.",
             '*.mimes' => 'Only PDF, JPG, JPEG, and PNG files are allowed.',
         ];
+    }
+
+    private function maxUploadLabel(): string
+    {
+        $kb = (int) config('recruitment.max_upload_size_kb');
+
+        if ($kb >= 1048576) {
+            $gb = $kb / 1048576;
+
+            return (fmod($gb, 1.0) === 0.0 ? (int) $gb : round($gb, 1)).' GB';
+        }
+
+        if ($kb >= 1024) {
+            return round($kb / 1024).' MB';
+        }
+
+        return $kb.' KB';
     }
 
     public function attributes(): array

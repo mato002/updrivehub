@@ -63,6 +63,10 @@
         'defensive_driving' => 5, 'declaration' => 6, 'digital_signature' => 6,
     ];
     $firstErrorStep = 1;
+    $maxUploadKb = (int) config('recruitment.max_upload_size_kb');
+    $maxUploadLabel = $maxUploadKb >= 1048576
+        ? ((int) ($maxUploadKb / 1048576)).' GB'
+        : (round($maxUploadKb / 1024).' MB');
     if ($errors->any()) {
         foreach ($errors->keys() as $key) {
             $baseKey = preg_replace('/\.\d+\./', '.', $key);
@@ -121,7 +125,7 @@
             </div>
         </div>
 
-        <form id="driver-application-form" action="{{ route('applications.store') }}" method="POST" enctype="multipart/form-data" novalidate class="glass-card !p-0 overflow-hidden">
+        <form id="driver-application-form" action="{{ route('applications.store') }}" method="POST" enctype="multipart/form-data" novalidate class="glass-card !p-0 overflow-hidden" data-max-upload-bytes="{{ $maxUploadKb * 1024 }}" data-max-upload-label="{{ $maxUploadLabel }}">
             @csrf
 
             {{-- Step 1 --}}
@@ -280,7 +284,7 @@
                     Required: National ID (front &amp; back), passport selfie, and driving licence. Other documents are optional.
                 </p>
                 <p class="text-sm text-slate-500">
-                    Accepted formats: PDF, JPG, JPEG, PNG. Maximum 5 MB per file.
+                    Accepted formats: PDF, JPG, JPEG, PNG. Maximum {{ $maxUploadLabel }} per file.
                 </p>
 
                 @php
