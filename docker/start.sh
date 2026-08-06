@@ -18,4 +18,4 @@ php artisan migrate --force --no-interaction
 
 php artisan storage:link --force 2>/dev/null || true
 
-exec php -S "0.0.0.0:${PORT:-8080}" docker/router.php
+exec php -S "0.0.0.0:${PORT:-8080}" -t public docker/router.php

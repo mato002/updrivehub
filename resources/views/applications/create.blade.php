@@ -75,7 +75,7 @@
 @endphp
 
 @section('content')
-    <div id="loading-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div id="loading-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm" style="display: none;">
         <div class="glass-card px-8 py-6 text-center">
             <i class="fa-solid fa-spinner fa-spin text-3xl text-brand-600"></i>
             <p class="mt-4 font-medium text-slate-700">Submitting your application...</p>

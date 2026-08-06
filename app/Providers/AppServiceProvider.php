@@ -23,11 +23,11 @@ class AppServiceProvider extends ServiceProvider
         $manifest = json_decode(file_get_contents($manifestPath), true);
 
         View::share('viteCss', isset($manifest['resources/css/app.css']['file'])
-            ? asset('build/'.$manifest['resources/css/app.css']['file'])
+            ? '/build/'.$manifest['resources/css/app.css']['file']
             : null);
 
         View::share('viteJs', isset($manifest['resources/js/app.js']['file'])
-            ? asset('build/'.$manifest['resources/js/app.js']['file'])
+            ? '/build/'.$manifest['resources/js/app.js']['file']
             : null);
     }
 }
