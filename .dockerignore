@@ -28,7 +28,7 @@ storage/framework/cache/data/*
 storage/framework/sessions/*
 storage/framework/views/*
 
-# Build artifacts (rebuilt in container)
+# Build artifacts (rebuilt in container; manifest committed as fallback)
 /public/hot
 /public/storage
 

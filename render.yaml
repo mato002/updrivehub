@@ -19,9 +19,7 @@ services:
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_URL
-        fromDatabase:
-          name: driver-recruitment-db
-          property: connectionString
+        sync: false
       - key: SESSION_DRIVER
         value: database
       - key: SESSION_SECURE_COOKIE
