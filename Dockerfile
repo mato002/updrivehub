@@ -20,22 +20,15 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 WORKDIR /var/www/html
 
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
-
-COPY package.json package-lock.json* .npmrc* ./
-RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
-
 COPY . .
 
-RUN composer dump-autoload --optimize \
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
+    && npm ci --ignore-scripts \
     && npm run build \
     && npm prune --production \
     && chmod +x docker/start.sh \
     && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
-
-USER www-data
+    && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
 
