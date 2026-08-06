@@ -3,7 +3,7 @@ services:
     name: driver-recruitment
     runtime: docker
     plan: free
-    region: frankfurt
+    region: oregon
     healthCheckPath: /up
     envVars:
       - key: APP_ENV
