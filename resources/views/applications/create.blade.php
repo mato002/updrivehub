@@ -187,59 +187,77 @@
 
             {{-- Step 3 --}}
             <div data-step-panel="3" class="hidden space-y-5 p-6 sm:p-8">
-                <div class="flex items-center justify-between">
-                    <h2 class="section-heading"><i class="fa-solid fa-building"></i> Employment History</h2>
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="section-heading"><i class="fa-solid fa-building"></i> Employment History</h2>
+                        <p class="mt-1 text-sm text-slate-500">Optional — skip this step if you have no previous employment history.</p>
+                    </div>
                     <button type="button" id="add-employer" class="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700">
-                        <i class="fa-solid fa-plus"></i> Add Another Employer
+                        <i class="fa-solid fa-plus"></i> <span id="add-employer-label">Add Employer</span>
                     </button>
                 </div>
-                <div id="employers-container" class="space-y-6">
-                    @php $oldEmployers = old('employment_history', [['company_name' => '']]); @endphp
-                    @foreach($oldEmployers as $index => $employer)
-                        <div class="employer-entry rounded-xl border border-slate-200 bg-white/50 p-5">
-                            <div class="mb-4 flex items-center justify-between">
-                                <h3 class="flex items-center gap-2 font-semibold text-slate-800">
-                                    <i class="fa-solid fa-briefcase text-brand-500"></i>
-                                    Employer <span class="employer-number">{{ $index + 1 }}</span>
-                                </h3>
-                                <button type="button" class="remove-employer inline-flex items-center gap-1 text-sm text-red-600 hover:text-red-700 {{ $index === 0 ? 'hidden' : '' }}">
-                                    <i class="fa-solid fa-trash-can"></i> Remove
-                                </button>
+
+                <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white/60 p-4">
+                    <input type="checkbox" name="no_employment_history" id="no_employment_history" value="1" @checked(old('no_employment_history')) class="mt-1 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span class="text-sm text-slate-700">
+                        <i class="fa-solid fa-circle-info mr-1 text-brand-500"></i>
+                        I have no previous employment history
+                    </span>
+                </label>
+
+                <div id="employment-fields" class="space-y-6 @if(old('no_employment_history')) hidden @endif">
+                    <div id="employers-container" class="space-y-6">
+                        @php $oldEmployers = old('no_employment_history') ? [] : old('employment_history', []); @endphp
+                        @foreach($oldEmployers as $index => $employer)
+                            <div class="employer-entry rounded-xl border border-slate-200 bg-white/50 p-5">
+                                <div class="mb-4 flex items-center justify-between">
+                                    <h3 class="flex items-center gap-2 font-semibold text-slate-800">
+                                        <i class="fa-solid fa-briefcase text-brand-500"></i>
+                                        Employer <span class="employer-number">{{ $index + 1 }}</span>
+                                    </h3>
+                                    <button type="button" class="remove-employer inline-flex items-center gap-1 text-sm text-red-600 hover:text-red-700">
+                                        <i class="fa-solid fa-trash-can"></i> Remove
+                                    </button>
+                                </div>
+                                <div class="grid gap-4 sm:grid-cols-2">
+                                    <div class="sm:col-span-2">
+                                        <label class="form-label"><i class="fa-solid fa-building mr-1.5 text-brand-500"></i>Company Name</label>
+                                        <input type="text" name="employment_history[{{ $index }}][company_name]" value="{{ $employer['company_name'] ?? '' }}" class="form-input employer-field">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"><i class="fa-solid fa-user-tie mr-1.5 text-brand-500"></i>Position</label>
+                                        <input type="text" name="employment_history[{{ $index }}][position]" value="{{ $employer['position'] ?? '' }}" class="form-input employer-field">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"><i class="fa-solid fa-calendar mr-1.5 text-brand-500"></i>Start Date</label>
+                                        <input type="date" name="employment_history[{{ $index }}][start_date]" value="{{ $employer['start_date'] ?? '' }}" class="form-input employer-field">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"><i class="fa-solid fa-calendar-check mr-1.5 text-brand-500"></i>End Date</label>
+                                        <input type="date" name="employment_history[{{ $index }}][end_date]" value="{{ $employer['end_date'] ?? '' }}" class="form-input employer-field">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"><i class="fa-solid fa-user mr-1.5 text-brand-500"></i>Supervisor Name</label>
+                                        <input type="text" name="employment_history[{{ $index }}][supervisor_name]" value="{{ $employer['supervisor_name'] ?? '' }}" class="form-input employer-field">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"><i class="fa-solid fa-phone mr-1.5 text-brand-500"></i>Supervisor Phone</label>
+                                        <input type="tel" name="employment_history[{{ $index }}][supervisor_phone]" value="{{ $employer['supervisor_phone'] ?? '' }}" class="form-input employer-field">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="form-label"><i class="fa-solid fa-door-open mr-1.5 text-brand-500"></i>Reason for Leaving</label>
+                                        <textarea name="employment_history[{{ $index }}][reason_for_leaving]" rows="2" class="form-input employer-field">{{ $employer['reason_for_leaving'] ?? '' }}</textarea>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="grid gap-4 sm:grid-cols-2">
-                                <div class="sm:col-span-2">
-                                    <label class="form-label"><i class="fa-solid fa-building mr-1.5 text-brand-500"></i>Company Name *</label>
-                                    <input type="text" name="employment_history[{{ $index }}][company_name]" value="{{ $employer['company_name'] ?? '' }}" required class="form-input">
-                                </div>
-                                <div>
-                                    <label class="form-label"><i class="fa-solid fa-user-tie mr-1.5 text-brand-500"></i>Position *</label>
-                                    <input type="text" name="employment_history[{{ $index }}][position]" value="{{ $employer['position'] ?? '' }}" required class="form-input">
-                                </div>
-                                <div>
-                                    <label class="form-label"><i class="fa-solid fa-calendar mr-1.5 text-brand-500"></i>Start Date *</label>
-                                    <input type="date" name="employment_history[{{ $index }}][start_date]" value="{{ $employer['start_date'] ?? '' }}" required class="form-input">
-                                </div>
-                                <div>
-                                    <label class="form-label"><i class="fa-solid fa-calendar-check mr-1.5 text-brand-500"></i>End Date</label>
-                                    <input type="date" name="employment_history[{{ $index }}][end_date]" value="{{ $employer['end_date'] ?? '' }}" class="form-input">
-                                </div>
-                                <div>
-                                    <label class="form-label"><i class="fa-solid fa-user mr-1.5 text-brand-500"></i>Supervisor Name *</label>
-                                    <input type="text" name="employment_history[{{ $index }}][supervisor_name]" value="{{ $employer['supervisor_name'] ?? '' }}" required class="form-input">
-                                </div>
-                                <div>
-                                    <label class="form-label"><i class="fa-solid fa-phone mr-1.5 text-brand-500"></i>Supervisor Phone *</label>
-                                    <input type="tel" name="employment_history[{{ $index }}][supervisor_phone]" value="{{ $employer['supervisor_phone'] ?? '' }}" required class="form-input">
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="form-label"><i class="fa-solid fa-door-open mr-1.5 text-brand-500"></i>Reason for Leaving *</label>
-                                    <textarea name="employment_history[{{ $index }}][reason_for_leaving]" rows="2" required class="form-input">{{ $employer['reason_for_leaving'] ?? '' }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+                    <p id="employment-empty-note" class="text-sm text-slate-500 @if(count($oldEmployers) > 0) hidden @endif">
+                        No employers added yet. Click "Add Employer" if you want to include employment history.
+                    </p>
                 </div>
                 @error('employment_history')<p class="form-error">{{ $message }}</p>@enderror
+                @error('employment_history.*.company_name')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
             {{-- Step 4 --}}
@@ -344,32 +362,32 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="sm:col-span-2">
-                    <label class="form-label"><i class="fa-solid fa-building mr-1.5 text-brand-500"></i>Company Name *</label>
-                    <input type="text" name="employment_history[__INDEX__][company_name]" required class="form-input">
+                    <label class="form-label"><i class="fa-solid fa-building mr-1.5 text-brand-500"></i>Company Name</label>
+                    <input type="text" name="employment_history[__INDEX__][company_name]" class="form-input employer-field">
                 </div>
                 <div>
-                    <label class="form-label"><i class="fa-solid fa-user-tie mr-1.5 text-brand-500"></i>Position *</label>
-                    <input type="text" name="employment_history[__INDEX__][position]" required class="form-input">
+                    <label class="form-label"><i class="fa-solid fa-user-tie mr-1.5 text-brand-500"></i>Position</label>
+                    <input type="text" name="employment_history[__INDEX__][position]" class="form-input employer-field">
                 </div>
                 <div>
-                    <label class="form-label"><i class="fa-solid fa-calendar mr-1.5 text-brand-500"></i>Start Date *</label>
-                    <input type="date" name="employment_history[__INDEX__][start_date]" required class="form-input">
+                    <label class="form-label"><i class="fa-solid fa-calendar mr-1.5 text-brand-500"></i>Start Date</label>
+                    <input type="date" name="employment_history[__INDEX__][start_date]" class="form-input employer-field">
                 </div>
                 <div>
                     <label class="form-label"><i class="fa-solid fa-calendar-check mr-1.5 text-brand-500"></i>End Date</label>
-                    <input type="date" name="employment_history[__INDEX__][end_date]" class="form-input">
+                    <input type="date" name="employment_history[__INDEX__][end_date]" class="form-input employer-field">
                 </div>
                 <div>
-                    <label class="form-label"><i class="fa-solid fa-user mr-1.5 text-brand-500"></i>Supervisor Name *</label>
-                    <input type="text" name="employment_history[__INDEX__][supervisor_name]" required class="form-input">
+                    <label class="form-label"><i class="fa-solid fa-user mr-1.5 text-brand-500"></i>Supervisor Name</label>
+                    <input type="text" name="employment_history[__INDEX__][supervisor_name]" class="form-input employer-field">
                 </div>
                 <div>
-                    <label class="form-label"><i class="fa-solid fa-phone mr-1.5 text-brand-500"></i>Supervisor Phone *</label>
-                    <input type="tel" name="employment_history[__INDEX__][supervisor_phone]" required class="form-input">
+                    <label class="form-label"><i class="fa-solid fa-phone mr-1.5 text-brand-500"></i>Supervisor Phone</label>
+                    <input type="tel" name="employment_history[__INDEX__][supervisor_phone]" class="form-input employer-field">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="form-label"><i class="fa-solid fa-door-open mr-1.5 text-brand-500"></i>Reason for Leaving *</label>
-                    <textarea name="employment_history[__INDEX__][reason_for_leaving]" rows="2" required class="form-input"></textarea>
+                    <label class="form-label"><i class="fa-solid fa-door-open mr-1.5 text-brand-500"></i>Reason for Leaving</label>
+                    <textarea name="employment_history[__INDEX__][reason_for_leaving]" rows="2" class="form-input employer-field"></textarea>
                 </div>
             </div>
         </div>

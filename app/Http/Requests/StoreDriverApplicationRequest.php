@@ -13,6 +13,22 @@ class StoreDriverApplicationRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->boolean('no_employment_history')) {
+            $this->merge(['employment_history' => []]);
+
+            return;
+        }
+
+        $history = collect($this->input('employment_history', []))
+            ->filter(fn (array $entry) => filled($entry['company_name'] ?? null))
+            ->values()
+            ->all();
+
+        $this->merge(['employment_history' => $history]);
+    }
+
     public function rules(): array
     {
         $maxKb = config('recruitment.max_upload_size_kb');
@@ -40,7 +56,7 @@ class StoreDriverApplicationRequest extends FormRequest
             'years_of_experience' => ['required', 'integer', 'min:0', 'max:60'],
             'vehicle_types' => ['required', 'array', 'min:1'],
             'vehicle_types.*' => ['string', Rule::in($vehicleKeys)],
-            'employment_history' => ['required', 'array', 'min:1'],
+            'employment_history' => ['nullable', 'array'],
             'employment_history.*.company_name' => ['required', 'string', 'max:255'],
             'employment_history.*.position' => ['required', 'string', 'max:255'],
             'employment_history.*.start_date' => ['required', 'date'],
@@ -48,6 +64,7 @@ class StoreDriverApplicationRequest extends FormRequest
             'employment_history.*.supervisor_name' => ['required', 'string', 'max:255'],
             'employment_history.*.supervisor_phone' => ['required', 'string', 'max:20'],
             'employment_history.*.reason_for_leaving' => ['required', 'string', 'max:500'],
+            'no_employment_history' => ['nullable', 'boolean'],
             'driving_career' => ['required', 'string', 'min:50', 'max:5000'],
             'id_front' => ['required', 'file', 'mimes:'.implode(',', $mimes), 'max:'.$maxKb],
             'id_back' => ['required', 'file', 'mimes:'.implode(',', $mimes), 'max:'.$maxKb],
@@ -86,8 +103,6 @@ class StoreDriverApplicationRequest extends FormRequest
             'licence_expiry_date.after' => 'Your driving licence must not be expired.',
             'vehicle_types.required' => 'Please select at least one vehicle type you have driven.',
             'vehicle_types.min' => 'Please select at least one vehicle type you have driven.',
-            'employment_history.required' => 'Please add at least one employer.',
-            'employment_history.min' => 'Please add at least one employer.',
             'driving_career.min' => 'Please provide at least 50 characters about your driving career.',
             'declaration.accepted' => 'You must accept the declaration to submit your application.',
             '*.max' => 'Each file must not exceed 5 MB.',

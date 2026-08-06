@@ -69,7 +69,7 @@ class DriverApplicationController extends Controller
                 'years_of_experience' => $request->input('years_of_experience'),
                 'vehicle_types' => $request->input('vehicle_types'),
                 'driving_career' => $request->input('driving_career'),
-                'employment_history' => $request->input('employment_history'),
+                'employment_history' => $request->input('employment_history', []) ?: [],
                 'digital_signature' => $request->input('digital_signature'),
                 'status' => 'submitted',
                 ...$paths,

@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('submit-application');
     const employerContainer = document.getElementById('employers-container');
     const addEmployerBtn = document.getElementById('add-employer');
+    const addEmployerLabel = document.getElementById('add-employer-label');
+    const noEmploymentCheckbox = document.getElementById('no_employment_history');
+    const employmentFields = document.getElementById('employment-fields');
+    const employmentEmptyNote = document.getElementById('employment-empty-note');
     const careerTextarea = document.getElementById('driving_career');
     const careerCounter = document.getElementById('career-counter');
     const loadingOverlay = document.getElementById('loading-overlay');
@@ -108,14 +112,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (step === 3) {
-            const employers = employerContainer.querySelectorAll('.employer-entry');
-            if (employers.length === 0) {
-                valid = false;
+            if (noEmploymentCheckbox?.checked) {
+                return valid;
             }
+
+            const employers = employerContainer.querySelectorAll('.employer-entry');
             employers.forEach(entry => {
-                entry.querySelectorAll('[required]').forEach(field => {
-                    if (!field.value.trim()) {
-                        showFieldError(field, 'This field is required.');
+                const companyName = entry.querySelector('[name*="company_name"]');
+                const hasCompany = companyName?.value.trim();
+
+                if (! hasCompany) {
+                    return;
+                }
+
+                entry.querySelectorAll('.employer-field').forEach(field => {
+                    if (! field.value.trim()) {
+                        showFieldError(field, 'This field is required when adding an employer.');
                         valid = false;
                     }
                 });
@@ -229,6 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 employerContainer.innerHTML = '';
                 data.employment_history.forEach((_, index) => addEmployerEntry(index));
             }
+
+            toggleNoEmploymentHistory();
+            updateEmploymentUi();
         } catch (_) {}
     }
 
@@ -246,13 +261,47 @@ document.addEventListener('DOMContentLoaded', () => {
         entry.querySelector('.employer-number').textContent = idx + 1;
 
         entry.querySelector('.remove-employer').addEventListener('click', () => {
-            if (employerContainer.querySelectorAll('.employer-entry').length <= 1) return;
             entry.remove();
             reindexEmployers();
+            updateEmploymentUi();
             saveDraft();
         });
 
         employerContainer.appendChild(entry);
+        updateEmploymentUi();
+    }
+
+    function updateEmploymentUi() {
+        const count = employerContainer.querySelectorAll('.employer-entry').length;
+
+        if (addEmployerLabel) {
+            addEmployerLabel.textContent = count === 0 ? 'Add Employer' : 'Add Another Employer';
+        }
+
+        if (employmentEmptyNote) {
+            employmentEmptyNote.classList.toggle('hidden', count > 0 || noEmploymentCheckbox?.checked);
+        }
+    }
+
+    function setEmploymentFieldsDisabled(disabled) {
+        employmentFields?.querySelectorAll('.employer-field').forEach(field => {
+            field.disabled = disabled;
+        });
+
+        if (addEmployerBtn) {
+            addEmployerBtn.disabled = disabled;
+            addEmployerBtn.classList.toggle('opacity-50', disabled);
+            addEmployerBtn.classList.toggle('pointer-events-none', disabled);
+        }
+    }
+
+    function toggleNoEmploymentHistory() {
+        const none = noEmploymentCheckbox?.checked;
+
+        employmentFields?.classList.toggle('hidden', !!none);
+        setEmploymentFieldsDisabled(!!none);
+        updateEmploymentUi();
+        saveDraft();
     }
 
     function reindexEmployers() {
@@ -370,6 +419,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return entry.querySelector('[name*="company_name"]')?.value || '';
         }).filter(Boolean);
 
+        const employersLabel = noEmploymentCheckbox?.checked
+            ? 'None provided'
+            : (employers.length ? employers.join(', ') : 'None provided');
+
         review.innerHTML = `
             <div class="space-y-4 text-sm">
                 <div><strong>Name:</strong> ${escapeHtml(fullName)}</div>
@@ -378,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div><strong>Licence:</strong> ${escapeHtml(licence)}</div>
                 <div><strong>Experience:</strong> ${escapeHtml(experience)} years</div>
                 <div><strong>Vehicle Types:</strong> ${escapeHtml(vehicleTypes.join(', '))}</div>
-                <div><strong>Employers:</strong> ${escapeHtml(employers.join(', '))}</div>
+                <div><strong>Employers:</strong> ${escapeHtml(employersLabel)}</div>
                 <div><strong>Driving Career:</strong><br>${escapeHtml(career.substring(0, 300))}${career.length > 300 ? '...' : ''}</div>
             </div>
         `;
@@ -406,9 +459,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     addEmployerBtn?.addEventListener('click', () => {
+        if (noEmploymentCheckbox?.checked) {
+            noEmploymentCheckbox.checked = false;
+            toggleNoEmploymentHistory();
+        }
         addEmployerEntry();
         saveDraft();
     });
+
+    noEmploymentCheckbox?.addEventListener('change', toggleNoEmploymentHistory);
 
     careerTextarea?.addEventListener('input', () => {
         if (careerCounter) {
@@ -434,19 +493,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     employerContainer.querySelectorAll('.remove-employer').forEach(btn => {
         btn.addEventListener('click', function () {
-            if (employerContainer.querySelectorAll('.employer-entry').length <= 1) return;
-            this.closest('.employer-entry').remove();
+            this.closest('.employer-entry')?.remove();
             reindexEmployers();
+            updateEmploymentUi();
             saveDraft();
         });
     });
 
-    if (employerContainer.querySelectorAll('.employer-entry').length === 0) {
-        addEmployerEntry(0);
-    }
-
     setupFileUploads();
     loadDraft();
+    toggleNoEmploymentHistory();
+    updateEmploymentUi();
     updateUI();
 
     if (careerTextarea && careerCounter) {
