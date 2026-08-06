@@ -33,7 +33,7 @@ COPY . .
 RUN composer dump-autoload --optimize \
     && npm run build \
     && rm -rf node_modules \
-    && chmod +x docker/start.sh \
+    && chmod +x docker/start.sh docker/router.php \
     && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
