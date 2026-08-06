@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <form id="driver-application-form" action="{{ route('applications.store') }}" method="POST" enctype="multipart/form-data" class="glass-card !p-0 overflow-hidden">
+        <form id="driver-application-form" action="{{ route('applications.store') }}" method="POST" enctype="multipart/form-data" novalidate class="glass-card !p-0 overflow-hidden">
             @csrf
 
             {{-- Step 1 --}}
@@ -277,6 +277,9 @@
                 <h2 class="section-heading"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Documents</h2>
                 <p class="flex items-center gap-2 text-sm text-slate-500">
                     <i class="fa-solid fa-circle-info text-brand-400"></i>
+                    Required: National ID (front &amp; back), passport selfie, and driving licence. Other documents are optional.
+                </p>
+                <p class="text-sm text-slate-500">
                     Accepted formats: PDF, JPG, JPEG, PNG. Maximum 5 MB per file.
                 </p>
 
@@ -296,17 +299,36 @@
 
                 <div class="grid gap-5 sm:grid-cols-2">
                     @foreach($documents as $doc)
+                        @php $inputId = 'document-' . $doc['name']; @endphp
                         <div data-file-upload>
-                            <label class="form-label">
+                            <p class="form-label">
                                 <i class="fa-solid {{ $documentIcons[$doc['name']] ?? 'fa-file' }} mr-1.5 text-brand-500"></i>
-                                {{ $doc['label'] }} @if($doc['required']) * @endif
+                                {{ $doc['label'] }}
+                                @if($doc['required'])
+                                    <span class="text-red-500">*</span>
+                                @else
+                                    <span class="font-normal text-slate-400">(Optional)</span>
+                                @endif
+                            </p>
+                            <label
+                                for="{{ $inputId }}"
+                                data-dropzone
+                                class="relative block cursor-pointer touch-manipulation rounded-xl border-2 border-dashed border-slate-300 bg-white/40 px-4 py-6 text-center transition hover:border-brand-400 hover:bg-brand-50/60 active:border-brand-500 active:bg-brand-50/80"
+                            >
+                                <input
+                                    type="file"
+                                    id="{{ $inputId }}"
+                                    name="{{ $doc['name'] }}"
+                                    class="sr-only"
+                                    accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"
+                                    @if($doc['required']) required @endif
+                                >
+                                <span class="pointer-events-none block">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-400"></i>
+                                    <span class="mt-2 block text-sm text-slate-500">Tap to choose a file</span>
+                                    <span data-filename class="mt-1 block text-xs font-medium text-brand-600"></span>
+                                </span>
                             </label>
-                            <div data-dropzone class="cursor-pointer rounded-xl border-2 border-dashed border-slate-300 bg-white/40 px-4 py-6 text-center transition hover:border-brand-400 hover:bg-brand-50/60">
-                                <input type="file" name="{{ $doc['name'] }}" class="hidden" accept=".pdf,.jpg,.jpeg,.png" @if($doc['required']) required @endif>
-                                <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-400"></i>
-                                <p class="mt-2 text-sm text-slate-500">Drag & drop or click to upload</p>
-                                <p data-filename class="mt-1 text-xs font-medium text-brand-600"></p>
-                            </div>
                             <div data-progress class="mt-2 hidden">
                                 <div class="h-1.5 overflow-hidden rounded-full bg-slate-200">
                                     <div data-progress-bar class="h-full w-0 rounded-full bg-brand-600 transition-all"></div>

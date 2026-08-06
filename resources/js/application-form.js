@@ -170,12 +170,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showFieldError(field, message) {
-        field.classList.add('border-red-500', 'ring-red-500/20');
-        let errorEl = field.parentElement.querySelector('.js-field-error');
+        const fileWrapper = field.type === 'file' ? field.closest('[data-file-upload]') : null;
+        const target = fileWrapper?.querySelector('[data-dropzone]') ?? field;
+        const errorHost = fileWrapper ?? field.parentElement;
+
+        target.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
+        let errorEl = errorHost.querySelector('.js-field-error');
         if (!errorEl) {
             errorEl = document.createElement('p');
             errorEl.className = 'form-error js-field-error';
-            field.parentElement.appendChild(errorEl);
+            errorHost.appendChild(errorEl);
         }
         errorEl.textContent = message;
     }
@@ -184,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const panel = form.querySelector(`[data-step-panel="${step}"]`);
         panel.querySelectorAll('.js-field-error').forEach(el => el.remove());
         panel.querySelectorAll('.border-red-500').forEach(el => {
-            el.classList.remove('border-red-500', 'ring-red-500/20');
+            el.classList.remove('border-red-500', 'ring-red-500/20', 'ring-2');
         });
         const vehicleError = document.getElementById('vehicle-types-error');
         if (vehicleError) vehicleError.classList.add('hidden');
@@ -347,8 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            dropzone.addEventListener('click', () => input.click());
-
             input.addEventListener('change', () => {
                 handleFile(input, preview, progress, progressBarEl, fileName);
             });
@@ -484,7 +486,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.type === 'checkbox' || e.target.type === 'select-one') saveDraft();
     });
 
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', e => {
+        for (let step = 1; step <= TOTAL_STEPS; step++) {
+            if (! validateStep(step)) {
+                e.preventDefault();
+                currentStep = step;
+                updateUI();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i> Submit Application';
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                return;
+            }
+        }
+
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Submitting...';
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
