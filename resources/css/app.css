@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-50: #eff6ff;
+    --color-brand-100: #dbeafe;
+    --color-brand-200: #bfdbfe;
+    --color-brand-300: #93c5fd;
+    --color-brand-400: #60a5fa;
+    --color-brand-500: #2563eb;
+    --color-brand-600: #1d4ed8;
+    --color-brand-700: #1e40af;
+    --color-brand-800: #1e3a8a;
+    --color-brand-900: #172554;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-800 antialiased;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+    }
+
+    .form-input {
+        @apply block w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+    }
+
+    .form-label {
+        @apply mb-1.5 block text-sm font-medium text-slate-700;
+    }
+
+    .form-error {
+        @apply mt-1 text-sm text-red-600;
+    }
+
+    .card {
+        @apply rounded-2xl border border-slate-200 bg-white p-6 shadow-sm;
+    }
+
+    .form-input-icon {
+        @apply pl-10;
+    }
+
+    .form-textarea-icon {
+        @apply pl-10;
+    }
+
+    .glass-card {
+        @apply rounded-2xl border border-white/40 bg-white/90 p-6 shadow-xl shadow-slate-900/10 backdrop-blur-md;
+    }
+
+    .glass-header {
+        @apply border-white/20 bg-white/80 backdrop-blur-md;
+    }
+
+    .glass-footer {
+        @apply border-white/20 bg-white/80 backdrop-blur-md;
+    }
+
+    .step-pill {
+        @apply flex flex-col items-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-xs font-semibold transition;
+    }
+
+    .step-pill i {
+        @apply text-base;
+    }
+
+    .section-heading {
+        @apply flex items-center gap-2 text-xl font-bold text-slate-900;
+    }
+
+    .section-heading i {
+        @apply flex h-9 w-9 items-center justify-center rounded-xl bg-brand-100 text-brand-600;
+    }
+}
+
+@layer utilities {
+    .form-page-bg {
+        background-image:
+            linear-gradient(135deg, rgba(23, 37, 84, 0.88) 0%, rgba(29, 78, 216, 0.75) 50%, rgba(15, 23, 42, 0.85) 100%),
+            var(--form-bg-image, url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1920&q=80'));
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+}

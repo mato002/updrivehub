@@ -1,0 +1,40 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE & OS
+.idea
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Tests & dev
+/tests
+.phpunit.result.cache
+phpunit.xml
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# Build artifacts (rebuilt in container)
+/public/hot
+/public/storage
+
+# Docs
+README.md
+*.md
+
+# Cursor
+.cursor
