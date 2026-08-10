@@ -16,6 +16,10 @@ fi
 
 php artisan migrate --force --no-interaction
 
+if [ "${SEED_DEMO_USERS:-false}" = "true" ]; then
+    php artisan db:seed --force --no-interaction
+fi
+
 php artisan storage:link --force 2>/dev/null || true
 
 exec php -S "0.0.0.0:${PORT:-8080}" -t public docker/router.php
