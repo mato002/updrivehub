@@ -44,7 +44,27 @@ jobs:
 
     - name: Run Production Migrations
       if: success()
+      env:
+        DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+        DEPLOY_SECRET: ${{ secrets.DEPLOY_SECRET }}
       run: |
-        curl -sf -X POST \
-          -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
-          "${{ secrets.DEPLOY_URL }}/deploy/migrate"
+        if [ -z "$DEPLOY_URL" ] || [ -z "$DEPLOY_SECRET" ]; then
+          echo "Skipping migrations: add DEPLOY_URL and DEPLOY_SECRET in GitHub repository secrets."
+          exit 0
+        fi
+
+        DEPLOY_URL="${DEPLOY_URL%/}"
+        HTTP_CODE=$(curl -sS -o /tmp/migrate-response.txt -w "%{http_code}" -X POST \
+          -H "X-Deploy-Secret: ${DEPLOY_SECRET}" \
+          "${DEPLOY_URL}/deploy/migrate")
+
+        cat /tmp/migrate-response.txt
+        echo ""
+        echo "HTTP status: ${HTTP_CODE}"
+
+        if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+          exit 0
+        fi
+
+        echo "Migration request failed. Check DEPLOY_URL, DEPLOY_SECRET, and production .env."
+        exit 1
