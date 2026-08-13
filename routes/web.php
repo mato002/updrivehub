@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApplicationController as AdminApplicationControll
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\DriverApplicationController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,10 @@ Route::get('/apply/success/{reference}', [DriverApplicationController::class, 's
 
 Route::redirect('/apply', '/');
 Route::get('/info', [HomeController::class, 'index'])->name('info');
+
+Route::post('/deploy/migrate', [DeployController::class, 'migrate'])
+    ->middleware('throttle:5,1')
+    ->name('deploy.migrate');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {

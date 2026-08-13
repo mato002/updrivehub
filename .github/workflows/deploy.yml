@@ -33,3 +33,10 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./
         server-dir: ./
+
+    - name: Run Production Migrations
+      if: success()
+      run: |
+        curl -sf -X POST \
+          -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
+          "${{ secrets.DEPLOY_URL }}/deploy/migrate"

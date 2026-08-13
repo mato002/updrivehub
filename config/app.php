@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Deploy Hook Secret
+    |--------------------------------------------------------------------------
+    |
+    | Shared secret used to authorize automated post-deploy tasks (e.g.
+    | migrations) when shell/SSH access is unavailable on the host.
+    |
+    */
+
+    'deploy_secret' => env('DEPLOY_SECRET'),
+
 ];
