@@ -3,19 +3,29 @@ name: Deploy Laravel via FTP
 on:
   push:
     branches:
-      - main  # Change this to 'master' if your default Git branch uses the old naming standard
+      - main  # Change this to 'master' if your main branch is master
 
 jobs:
   web-deploy:
-    name: Sync Project Files
+    name: Build & Sync Project Files
     runs-on: ubuntu-latest
     steps:
     - name: Get Latest Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-      
-    - name: Sync Files to Namecheap Server
+
+    - name: Setup PHP Environment
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2' # Match your specific project PHP version requirement
+        extensions: mbstring, xml, ctype, iconv, mysql, zip
+
+    - name: Install Composer Dependencies
+      run: |
+        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+    - name: Sync Production Files to Server
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
