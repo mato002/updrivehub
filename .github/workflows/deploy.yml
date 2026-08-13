@@ -3,27 +3,15 @@ name: Deploy Laravel via FTP
 on:
   push:
     branches:
-      - main  # Change this to 'master' if your main branch is master
+      - main
 
 jobs:
   web-deploy:
-    name: Build & Sync Project Files
+    name: Sync Code to Production
     runs-on: ubuntu-latest
     steps:
     - name: Get Latest Code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup PHP Environment
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.4'
-        extensions: mbstring, xml, ctype, iconv, mysql, zip
-
-    - name: Install Composer Dependencies
-      run: |
-        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
     - name: Sync Production Files to Server
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -33,6 +21,26 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./
         server-dir: ./
+        log-level: minimal
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/vendor/**
+          **/.github/**
+          **/tests/**
+          **/storage/logs/**
+          **/storage/framework/cache/**
+          **/storage/framework/sessions/**
+          **/storage/framework/views/**
+          **/.env
+          **/.env.*
+          **/vendor.zip
+          phpunit.xml
+          phpunit.xml.dist
+          .editorconfig
+          .gitattributes
+          .gitignore
 
     - name: Run Production Migrations
       if: success()
