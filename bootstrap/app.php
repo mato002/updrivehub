@@ -14,7 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             Route::post('/deploy/migrate', [DeployController::class, 'migrate'])
-                ->middleware('throttle:5,1')
                 ->name('deploy.migrate');
         },
     )
