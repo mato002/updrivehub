@@ -1,0 +1,25 @@
+name: Deploy Laravel via FTP
+
+on:
+  push:
+    branches:
+      - main  # Change this to 'master' if your default Git branch uses the old naming standard
+
+jobs:
+  web-deploy:
+    name: Sync Project Files
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get Latest Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+      
+    - name: Sync Files to Namecheap Server
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: ./
