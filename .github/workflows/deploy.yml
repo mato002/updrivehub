@@ -18,7 +18,7 @@ jobs:
     - name: Setup PHP Environment
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2' # Match your specific project PHP version requirement
+        php-version: '8.4'
         extensions: mbstring, xml, ctype, iconv, mysql, zip
 
     - name: Install Composer Dependencies
