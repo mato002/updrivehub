@@ -74,6 +74,13 @@
                     <p class="mt-1 text-sm text-slate-500">Sign in to your admin account to continue</p>
                 </div>
 
+                @if (session('success'))
+                    <div class="mb-6 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                        <i class="fa-solid fa-circle-check"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
@@ -97,6 +104,7 @@
                     <div>
                         <div class="mb-1.5 flex items-center justify-between">
                             <label for="password" class="form-label !mb-0">Password</label>
+                            <a href="{{ route('admin.password.request') }}" class="text-xs font-medium text-brand-600 hover:text-brand-700">Forgot password?</a>
                         </div>
                         <div class="login-input-wrap">
                             <i class="fa-solid fa-lock login-input-icon"></i>

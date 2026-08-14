@@ -35,6 +35,18 @@
                     <i class="fa-solid fa-folder-open w-5 text-center"></i>
                     Applications
                 </a>
+                @permission('users.view')
+                    <a href="{{ route('admin.users.index') }}" class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users-gear w-5 text-center"></i>
+                        Team
+                    </a>
+                @endpermission
+                @permission('settings.view')
+                    <a href="{{ route('admin.settings.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+                        Settings
+                    </a>
+                @endpermission
                 <a href="{{ route('home') }}" target="_blank" class="admin-nav-link">
                     <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i>
                     Public Form
@@ -48,7 +60,7 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-medium">{{ auth()->user()->name }}</p>
-                        <p class="truncate text-xs text-slate-400">{{ auth()->user()->email }}</p>
+                        <p class="truncate text-xs text-slate-400">{{ auth()->user()->roleLabel() }}</p>
                     </div>
                 </div>
                 <form action="{{ route('admin.logout') }}" method="POST">

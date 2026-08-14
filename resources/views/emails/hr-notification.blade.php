@@ -20,13 +20,11 @@ A new driver application has been submitted.
 
 {{ $application->driving_career }}
 
-## Uploaded Documents
+<x-mail::button :url="$adminUrl">
+Review Application in Admin Portal
+</x-mail::button>
 
-@foreach($documentLinks as $document)
-- [{{ $document['label'] }}]({{ $document['url'] }})
-@endforeach
-
-Documents are attached to this email where file size permits. Use the links above for any files not attached.
+Documents are attached to this email where file size permits. Additional files can be viewed securely in the admin portal.
 
 Thanks,<br>
 {{ config('recruitment.company_name') }} Recruitment System

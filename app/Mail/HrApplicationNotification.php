@@ -31,50 +31,37 @@ class HrApplicationNotification extends Mailable
             markdown: 'emails.hr-notification',
             with: [
                 'application' => $this->application,
-                'documentLinks' => $this->documentLinks(),
+                'adminUrl' => route('admin.applications.show', $this->application),
             ],
         );
     }
 
     public function attachments(): array
     {
+        $storage = app(DocumentStorageService::class);
         $attachments = [];
         $totalSize = 0;
         $maxAttachBytes = 8 * 1024 * 1024;
 
-        foreach ($this->application->documentPaths() as $label => $path) {
-            if (! Storage::disk('public')->exists($path)) {
+        foreach ($this->application->documentPaths() as $path) {
+            if (! $storage->exists($path)) {
                 continue;
             }
 
-            $size = Storage::disk('public')->size($path);
+            $disk = $storage->diskForPath($path);
+            $size = Storage::disk($disk)->size($path);
 
             if ($totalSize + $size > $maxAttachBytes) {
                 continue;
             }
 
-            $attachments[] = Attachment::fromStorageDisk('public', $path)
+            $attachments[] = Attachment::fromStorageDisk($disk, $path)
                 ->as(basename($path))
-                ->withMime(Storage::disk('public')->mimeType($path));
+                ->withMime($storage->mimeType($path));
 
             $totalSize += $size;
         }
 
         return $attachments;
-    }
-
-    protected function documentLinks(): array
-    {
-        $storage = app(DocumentStorageService::class);
-        $links = [];
-
-        foreach ($this->application->documentPaths() as $label => $path) {
-            $links[] = [
-                'label' => $label,
-                'url' => $storage->url($path),
-            ];
-        }
-
-        return $links;
     }
 }

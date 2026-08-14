@@ -170,6 +170,7 @@
                     <i class="fa-solid fa-clipboard-check text-brand-500"></i>
                     Review Application
                 </h2>
+                @permission('applications.update')
                 <form method="POST" action="{{ route('admin.applications.update-status', $application) }}" class="space-y-4">
                     @csrf
                     @method('PATCH')
@@ -190,6 +191,31 @@
                         Save Review
                     </button>
                 </form>
+                @else
+                    <p class="text-sm text-slate-500">You have read-only access to this application.</p>
+                @endpermission
+            </section>
+
+            <section class="admin-stat-card">
+                <h2 class="mb-4 flex items-center gap-2 text-base font-bold text-slate-900">
+                    <i class="fa-solid fa-clock-rotate-left text-brand-500"></i>
+                    Activity Timeline
+                </h2>
+                @if($application->activityLogs->isEmpty())
+                    <p class="text-sm text-slate-500">No activity recorded yet.</p>
+                @else
+                    <div class="space-y-4">
+                        @foreach($application->activityLogs as $log)
+                            <div class="border-l-2 border-brand-200 pl-4">
+                                <p class="text-sm font-medium text-slate-900">{{ $log->description }}</p>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    {{ $log->created_at->format('M j, Y g:i A') }}
+                                    @if($log->user) · {{ $log->user->name }} @endif
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </section>
 
             <section class="admin-stat-card">

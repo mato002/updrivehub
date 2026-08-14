@@ -64,6 +64,20 @@ class DriverApplication extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+    public function activityLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApplicationActivityLog::class)->latest();
+    }
+
+    public function scopeFiltered(Builder $query, array $filters): Builder
+    {
+        return $query
+            ->search($filters['search'] ?? null)
+            ->status($filters['status'] ?? null)
+            ->county($filters['county'] ?? null)
+            ->submittedBetween($filters['date_from'] ?? null, $filters['date_to'] ?? null);
+    }
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         if (! filled($term)) {

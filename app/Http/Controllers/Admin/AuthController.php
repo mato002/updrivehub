@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     public function create(): View|RedirectResponse
     {
-        if (Auth::check() && Auth::user()->is_admin) {
+        if (Auth::check() && Auth::user()->canAccessAdmin()) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -38,7 +38,7 @@ class AuthController extends Controller
                 ->withErrors(['email' => 'These credentials do not match our records.']);
         }
 
-        if (! Auth::user()->is_admin) {
+        if (! Auth::user()->canAccessAdmin()) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

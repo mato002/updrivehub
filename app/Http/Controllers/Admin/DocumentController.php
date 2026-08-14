@@ -3,44 +3,67 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\DriverApplication;
+use App\Services\ActivityLogger;
 use App\Services\DocumentStorageService;
+use App\Models\DriverApplication;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentController extends Controller
 {
-    public function show(DriverApplication $application, string $document, DocumentStorageService $documentStorage): Response|StreamedResponse
-    {
+    public function show(
+        DriverApplication $application,
+        string $document,
+        DocumentStorageService $documentStorage,
+        ActivityLogger $activityLogger,
+    ): Response|StreamedResponse {
         $path = $application->pathForDocument($document);
 
-        if (! $path || ! Storage::disk('public')->exists($path)) {
+        if (! $path || ! $documentStorage->exists($path)) {
             abort(404, 'Document not found.');
         }
 
+        $activityLogger->log(
+            $application,
+            'document_viewed',
+            'Viewed document: '.config("recruitment.document_fields.{$document}.label", $document),
+            auth()->user(),
+            ['document' => $document],
+        );
+
         $absolutePath = $documentStorage->absolutePath($path);
         $filename = basename($path);
-        $mime = Storage::disk('public')->mimeType($path) ?: 'application/octet-stream';
 
         return response()->file($absolutePath, [
-            'Content-Type' => $mime,
+            'Content-Type' => $documentStorage->mimeType($path),
             'Content-Disposition' => 'inline; filename="'.$filename.'"',
         ]);
     }
 
-    public function download(DriverApplication $application, string $document, DocumentStorageService $documentStorage): StreamedResponse
-    {
+    public function download(
+        DriverApplication $application,
+        string $document,
+        DocumentStorageService $documentStorage,
+        ActivityLogger $activityLogger,
+    ): StreamedResponse {
         $path = $application->pathForDocument($document);
 
-        if (! $path || ! Storage::disk('public')->exists($path)) {
+        if (! $path || ! $documentStorage->exists($path)) {
             abort(404, 'Document not found.');
         }
+
+        $activityLogger->log(
+            $application,
+            'document_downloaded',
+            'Downloaded document: '.config("recruitment.document_fields.{$document}.label", $document),
+            auth()->user(),
+            ['document' => $document],
+        );
 
         $label = config("recruitment.document_fields.{$document}.label", $document);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
         $filename = str($label)->slug().'.'.$extension;
 
-        return Storage::disk('public')->download($path, $filename);
+        return $documentStorage->downloadResponse($path, $filename);
     }
 }
