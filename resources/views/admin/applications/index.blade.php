@@ -41,12 +41,12 @@
                 </div>
             </div>
             <div class="flex flex-wrap items-end gap-2 md:col-span-2 xl:col-span-5">
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary w-full sm:w-auto">
                     <i class="fa-solid fa-filter mr-1.5"></i> Apply Filters
                 </button>
-                <a href="{{ route('admin.applications.index') }}" class="btn-secondary">Clear</a>
+                <a href="{{ route('admin.applications.index') }}" class="btn-secondary w-full sm:w-auto">Clear</a>
                 @permission('applications.export')
-                    <a href="{{ route('admin.applications.export', $filters) }}" class="btn-secondary">
+                    <a href="{{ route('admin.applications.export', $filters) }}" class="btn-secondary w-full sm:w-auto">
                         <i class="fa-solid fa-file-csv mr-1.5"></i> Export CSV
                     </a>
                 @endpermission
@@ -72,7 +72,7 @@
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="btn-primary" id="bulk-submit" disabled>
+                <button type="submit" class="btn-primary w-full sm:w-auto" id="bulk-submit" disabled>
                     <i class="fa-solid fa-layer-group mr-1.5"></i> Update Selected
                 </button>
             </div>

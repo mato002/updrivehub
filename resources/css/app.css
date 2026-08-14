@@ -97,15 +97,31 @@
     }
 
     .admin-sidebar {
-        @apply fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-slate-900 text-white transition-transform duration-200 lg:static lg:translate-x-0;
+        @apply fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] -translate-x-full flex-col border-r border-slate-200 bg-slate-900 text-white transition-transform duration-200 lg:static lg:max-w-none lg:translate-x-0;
     }
 
     .admin-sidebar.open {
         @apply translate-x-0;
     }
 
+    .admin-sidebar-overlay {
+        @apply fixed inset-0 z-40 bg-black/50 lg:hidden;
+    }
+
     .admin-sidebar-brand {
-        @apply flex items-center gap-3 border-b border-white/10 px-5 py-5;
+        @apply flex shrink-0 items-center gap-3 border-b border-white/10 px-5 py-5;
+    }
+
+    .admin-sidebar-nav {
+        @apply flex-1 overflow-y-auto px-3 py-4;
+    }
+
+    .admin-sidebar-footer {
+        @apply shrink-0 border-t border-white/10 p-3;
+    }
+
+    .admin-sidebar-utility-link {
+        @apply flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-400 transition hover:bg-white/5 hover:text-slate-200;
     }
 
     .admin-nav-link {
@@ -117,11 +133,71 @@
     }
 
     .admin-main {
-        @apply flex min-h-screen flex-1 flex-col lg:ml-0;
+        @apply flex min-h-screen min-w-0 flex-1 flex-col lg:ml-0;
     }
 
     .admin-header {
-        @apply sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:px-6;
+        @apply sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6 sm:py-4;
+    }
+
+    .admin-header-inner {
+        @apply flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between;
+    }
+
+    .admin-header-left {
+        @apply flex min-w-0 items-start gap-3 sm:items-center;
+    }
+
+    .admin-header-actions {
+        @apply flex flex-wrap items-center gap-2 sm:justify-end;
+    }
+
+    .admin-mobile-menu-btn {
+        @apply shrink-0 rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50 lg:hidden;
+    }
+
+    .admin-breadcrumb {
+        @apply mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-400;
+    }
+
+    .admin-header-pill {
+        @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition;
+    }
+
+    .admin-header-pill-muted {
+        @apply border-slate-200 bg-slate-50 text-slate-600;
+    }
+
+    .admin-header-pill-warning {
+        @apply border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100;
+    }
+
+    .admin-profile-wrap {
+        @apply relative ml-auto sm:ml-0;
+    }
+
+    .admin-profile-btn {
+        @apply flex max-w-[220px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:max-w-none sm:px-3;
+    }
+
+    .admin-profile-avatar {
+        @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white;
+    }
+
+    .admin-profile-menu {
+        @apply absolute right-0 top-full z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-slate-200 bg-white py-1 shadow-lg ring-1 ring-black/5;
+    }
+
+    .admin-profile-menu-header {
+        @apply border-b border-slate-100 px-4 py-3;
+    }
+
+    .admin-profile-menu-item {
+        @apply flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-slate-700 transition hover:bg-slate-50;
+    }
+
+    .admin-profile-menu-item-danger {
+        @apply text-red-600 hover:bg-red-50;
     }
 
     .admin-content {

@@ -13,20 +13,33 @@
     @stack('head')
 </head>
 <body class="bg-slate-100 antialiased">
+    @php
+        $breadcrumb = match (true) {
+            request()->routeIs('admin.dashboard') => 'Dashboard',
+            request()->routeIs('admin.applications.index') => 'Applications',
+            request()->routeIs('admin.applications.show') => 'Application detail',
+            request()->routeIs('admin.users.create') => 'Team / Add member',
+            request()->routeIs('admin.users.edit') => 'Team / Edit member',
+            request()->routeIs('admin.users.*') => 'Team',
+            request()->routeIs('admin.settings.*') => 'Settings',
+            default => 'Admin',
+        };
+    @endphp
+
     <div class="admin-shell">
         {{-- Sidebar --}}
         <aside id="admin-sidebar" class="admin-sidebar">
             <div class="admin-sidebar-brand">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white">
                     <i class="fa-solid fa-truck-fast"></i>
                 </div>
-                <div>
-                    <p class="text-sm font-bold">{{ config('recruitment.company_name') }}</p>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-bold">{{ config('recruitment.company_name') }}</p>
                     <p class="text-xs text-slate-400">Admin Panel</p>
                 </div>
             </div>
 
-            <nav class="flex-1 space-y-1 px-3 py-4">
+            <nav class="admin-sidebar-nav space-y-1">
                 <a href="{{ route('admin.dashboard') }}" class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-gauge-high w-5 text-center"></i>
                     Dashboard
@@ -47,52 +60,94 @@
                         Settings
                     </a>
                 @endpermission
-                <a href="{{ route('home') }}" target="_blank" class="admin-nav-link">
-                    <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i>
-                    Public Form
-                </a>
             </nav>
 
-            <div class="border-t border-white/10 p-4">
-                <div class="mb-3 flex items-center gap-3 px-2">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-sm font-bold">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="truncate text-sm font-medium">{{ auth()->user()->name }}</p>
-                        <p class="truncate text-xs text-slate-400">{{ auth()->user()->roleLabel() }}</p>
-                    </div>
-                </div>
-                <form action="{{ route('admin.logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="admin-nav-link w-full text-left text-red-300 hover:text-red-200">
-                        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
-                        Sign Out
-                    </button>
-                </form>
+            <div class="admin-sidebar-footer">
+                <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer" class="admin-sidebar-utility-link">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span>View public application form</span>
+                </a>
             </div>
         </aside>
 
-        <div id="admin-overlay" class="fixed inset-0 z-40 hidden bg-black/50 lg:hidden"></div>
+        <div id="admin-overlay" class="admin-sidebar-overlay hidden"></div>
 
         <div class="admin-main">
             {{-- Header --}}
             <header class="admin-header">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <button type="button" id="sidebar-toggle" class="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 lg:hidden">
+                <div class="admin-header-inner">
+                    <div class="admin-header-left">
+                        <button type="button" id="sidebar-toggle" class="admin-mobile-menu-btn" aria-label="Open navigation">
                             <i class="fa-solid fa-bars"></i>
                         </button>
-                        <div>
-                            <h1 class="text-lg font-bold text-slate-900">@yield('page-title', 'Dashboard')</h1>
+                        <div class="min-w-0">
+                            <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+                                <span>Admin</span>
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                <span>{{ $breadcrumb }}</span>
+                            </nav>
+                            <h1 class="truncate text-lg font-bold text-slate-900 sm:text-xl">@yield('page-title', 'Dashboard')</h1>
                             @hasSection('page-subtitle')
-                                <p class="text-sm text-slate-500">@yield('page-subtitle')</p>
+                                <p class="truncate text-sm text-slate-500">@yield('page-subtitle')</p>
                             @endif
                         </div>
                     </div>
-                    <div class="hidden items-center gap-2 text-sm text-slate-500 sm:flex">
-                        <i class="fa-regular fa-clock"></i>
-                        {{ now()->format('M j, Y — g:i A') }}
+
+                    <div class="admin-header-actions">
+                        @permission('applications.view')
+                            @if (($pendingApplicationsCount ?? 0) > 0)
+                                <a href="{{ route('admin.applications.index', ['status' => 'submitted']) }}" class="admin-header-pill admin-header-pill-warning">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <span>{{ $pendingApplicationsCount }} pending</span>
+                                </a>
+                            @endif
+                        @endpermission
+
+                        <span class="admin-header-pill admin-header-pill-muted hidden sm:inline-flex">
+                            <i class="fa-regular fa-clock"></i>
+                            <span>{{ now()->format('M j, Y') }}</span>
+                            <span class="hidden md:inline">{{ now()->format('— g:i A') }}</span>
+                        </span>
+
+                        <div class="admin-profile-wrap">
+                            <button type="button" id="profile-toggle" class="admin-profile-btn" aria-expanded="false" aria-haspopup="true">
+                                <span class="admin-profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                                <span class="hidden min-w-0 sm:block">
+                                    <span class="block truncate text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</span>
+                                    <span class="block truncate text-xs text-slate-500">{{ auth()->user()->roleLabel() }}</span>
+                                </span>
+                                <i class="fa-solid fa-chevron-down hidden text-xs text-slate-400 sm:inline"></i>
+                            </button>
+
+                            <div id="profile-menu" class="admin-profile-menu hidden" role="menu">
+                                <div class="admin-profile-menu-header">
+                                    <p class="truncate font-semibold text-slate-900">{{ auth()->user()->name }}</p>
+                                    <p class="truncate text-sm text-slate-500">{{ auth()->user()->email }}</p>
+                                    <span class="mt-2 inline-flex rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                                        {{ auth()->user()->roleLabel() }}
+                                    </span>
+                                </div>
+                                @permission('settings.view')
+                                    <a href="{{ route('admin.settings.edit') }}" class="admin-profile-menu-item" role="menuitem">
+                                        <i class="fa-solid fa-gear w-4 text-center text-slate-400"></i>
+                                        Settings
+                                    </a>
+                                @endpermission
+                                <a href="{{ route('admin.applications.index') }}" class="admin-profile-menu-item" role="menuitem">
+                                    <i class="fa-solid fa-folder-open w-4 text-center text-slate-400"></i>
+                                    Applications
+                                </a>
+                                <div class="border-t border-slate-100">
+                                    <form action="{{ route('admin.logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="admin-profile-menu-item admin-profile-menu-item-danger" role="menuitem">
+                                            <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
+                                            Sign out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -117,13 +172,54 @@
     </div>
 
     <script>
+        const sidebar = document.getElementById('admin-sidebar');
+        const overlay = document.getElementById('admin-overlay');
+        const profileToggle = document.getElementById('profile-toggle');
+        const profileMenu = document.getElementById('profile-menu');
+
+        const closeSidebar = () => {
+            sidebar?.classList.remove('open');
+            overlay?.classList.add('hidden');
+        };
+
         document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
-            document.getElementById('admin-sidebar')?.classList.toggle('open');
-            document.getElementById('admin-overlay')?.classList.toggle('hidden');
+            sidebar?.classList.toggle('open');
+            overlay?.classList.toggle('hidden');
         });
-        document.getElementById('admin-overlay')?.addEventListener('click', () => {
-            document.getElementById('admin-sidebar')?.classList.remove('open');
-            document.getElementById('admin-overlay')?.classList.add('hidden');
+
+        overlay?.addEventListener('click', closeSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                closeSidebar();
+            }
+        });
+
+        const closeProfileMenu = () => {
+            profileMenu?.classList.add('hidden');
+            profileToggle?.setAttribute('aria-expanded', 'false');
+        };
+
+        profileToggle?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isOpen = !profileMenu?.classList.contains('hidden');
+            if (isOpen) {
+                closeProfileMenu();
+            } else {
+                profileMenu?.classList.remove('hidden');
+                profileToggle?.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        profileMenu?.addEventListener('click', (event) => event.stopPropagation());
+
+        document.addEventListener('click', closeProfileMenu);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeProfileMenu();
+                closeSidebar();
+            }
         });
     </script>
     @stack('scripts')

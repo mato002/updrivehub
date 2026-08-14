@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\DriverApplication;
 use App\Services\SettingsService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -39,6 +40,18 @@ class AppServiceProvider extends ServiceProvider
 
             $settings = app(SettingsService::class);
             $view->with('companyName', $settings->get('company_name', config('recruitment.company_name')));
+        });
+
+        View::composer('layouts.admin', function ($view) {
+            $pendingApplicationsCount = 0;
+
+            if (auth()->check() && auth()->user()->hasPermission('applications.view')) {
+                $pendingApplicationsCount = DriverApplication::query()
+                    ->where('status', 'submitted')
+                    ->count();
+            }
+
+            $view->with('pendingApplicationsCount', $pendingApplicationsCount);
         });
     }
 }
