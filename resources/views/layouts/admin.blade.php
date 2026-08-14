@@ -76,69 +76,9 @@
             {{-- Header --}}
             <header class="admin-header">
                 <div class="admin-header-inner">
-                    <div class="admin-header-top">
-                        <button type="button" id="sidebar-toggle" class="admin-mobile-menu-btn" aria-label="Open navigation">
-                            <i class="fa-solid fa-bars"></i>
-                        </button>
-
-                        <div class="admin-header-actions">
-                            @permission('applications.view')
-                                @if (($pendingApplicationsCount ?? 0) > 0)
-                                    <a href="{{ route('admin.applications.index', ['status' => 'submitted']) }}" class="admin-header-pill admin-header-pill-warning">
-                                        <i class="fa-solid fa-inbox"></i>
-                                        <span>{{ $pendingApplicationsCount }}</span>
-                                        <span class="hidden sm:inline">pending</span>
-                                    </a>
-                                @endif
-                            @endpermission
-
-                            <span class="admin-header-pill admin-header-pill-muted hidden md:inline-flex">
-                                <i class="fa-regular fa-clock"></i>
-                                <span>{{ now()->format('M j, Y') }}</span>
-                                <span class="hidden lg:inline">{{ now()->format('— g:i A') }}</span>
-                            </span>
-
-                            <div class="admin-profile-wrap">
-                                <button type="button" id="profile-toggle" class="admin-profile-btn" aria-expanded="false" aria-haspopup="true">
-                                    <span class="admin-profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                                    <span class="hidden min-w-0 md:block">
-                                        <span class="block truncate text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</span>
-                                        <span class="block truncate text-xs text-slate-500">{{ auth()->user()->roleLabel() }}</span>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-down hidden text-xs text-slate-400 md:inline"></i>
-                                </button>
-
-                                <div id="profile-menu" class="admin-profile-menu hidden" role="menu">
-                                    <div class="admin-profile-menu-header">
-                                        <p class="truncate font-semibold text-slate-900">{{ auth()->user()->name }}</p>
-                                        <p class="truncate text-sm text-slate-500">{{ auth()->user()->email }}</p>
-                                        <span class="mt-2 inline-flex rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
-                                            {{ auth()->user()->roleLabel() }}
-                                        </span>
-                                    </div>
-                                    @permission('settings.view')
-                                        <a href="{{ route('admin.settings.edit') }}" class="admin-profile-menu-item" role="menuitem">
-                                            <i class="fa-solid fa-gear w-4 text-center text-slate-400"></i>
-                                            Settings
-                                        </a>
-                                    @endpermission
-                                    <a href="{{ route('admin.applications.index') }}" class="admin-profile-menu-item" role="menuitem">
-                                        <i class="fa-solid fa-folder-open w-4 text-center text-slate-400"></i>
-                                        Applications
-                                    </a>
-                                    <div class="border-t border-slate-100">
-                                        <form action="{{ route('admin.logout') }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="admin-profile-menu-item admin-profile-menu-item-danger" role="menuitem">
-                                                <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
-                                                Sign out
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <button type="button" id="sidebar-toggle" class="admin-mobile-menu-btn" aria-label="Open navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
 
                     <div class="admin-header-title">
                         <nav class="admin-breadcrumb" aria-label="Breadcrumb">
@@ -150,6 +90,64 @@
                         @hasSection('page-subtitle')
                             <p class="line-clamp-2 text-sm text-slate-500 sm:line-clamp-none">@yield('page-subtitle')</p>
                         @endif
+                    </div>
+
+                    <div class="admin-header-actions">
+                        @permission('applications.view')
+                            @if (($pendingApplicationsCount ?? 0) > 0)
+                                <a href="{{ route('admin.applications.index', ['status' => 'submitted']) }}" class="admin-header-pill admin-header-pill-warning">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <span>{{ $pendingApplicationsCount }}</span>
+                                    <span class="hidden sm:inline">pending</span>
+                                </a>
+                            @endif
+                        @endpermission
+
+                        <span class="admin-header-pill admin-header-pill-muted hidden md:inline-flex">
+                            <i class="fa-regular fa-clock"></i>
+                            <span>{{ now()->format('M j, Y') }}</span>
+                            <span class="hidden lg:inline">{{ now()->format('— g:i A') }}</span>
+                        </span>
+
+                        <div class="admin-profile-wrap">
+                            <button type="button" id="profile-toggle" class="admin-profile-btn" aria-expanded="false" aria-haspopup="true">
+                                <span class="admin-profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                                <span class="hidden min-w-0 md:block">
+                                    <span class="block truncate text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</span>
+                                    <span class="block truncate text-xs text-slate-500">{{ auth()->user()->roleLabel() }}</span>
+                                </span>
+                                <i class="fa-solid fa-chevron-down hidden text-xs text-slate-400 md:inline"></i>
+                            </button>
+
+                            <div id="profile-menu" class="admin-profile-menu hidden" role="menu">
+                                <div class="admin-profile-menu-header">
+                                    <p class="truncate font-semibold text-slate-900">{{ auth()->user()->name }}</p>
+                                    <p class="truncate text-sm text-slate-500">{{ auth()->user()->email }}</p>
+                                    <span class="mt-2 inline-flex rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                                        {{ auth()->user()->roleLabel() }}
+                                    </span>
+                                </div>
+                                @permission('settings.view')
+                                    <a href="{{ route('admin.settings.edit') }}" class="admin-profile-menu-item" role="menuitem">
+                                        <i class="fa-solid fa-gear w-4 text-center text-slate-400"></i>
+                                        Settings
+                                    </a>
+                                @endpermission
+                                <a href="{{ route('admin.applications.index') }}" class="admin-profile-menu-item" role="menuitem">
+                                    <i class="fa-solid fa-folder-open w-4 text-center text-slate-400"></i>
+                                    Applications
+                                </a>
+                                <div class="border-t border-slate-100">
+                                    <form action="{{ route('admin.logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="admin-profile-menu-item admin-profile-menu-item-danger" role="menuitem">
+                                            <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
+                                            Sign out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
