@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class SettingsService
 {
@@ -20,10 +22,18 @@ class SettingsService
 
     public function all(): array
     {
-        return Cache::remember(self::CACHE_KEY, 300, function () {
-            $stored = Setting::query()->pluck('value', 'key')->all();
+        if (! $this->tableExists()) {
+            return $this->defaults();
+        }
 
-            return array_merge($this->defaults(), $stored);
+        return Cache::remember(self::CACHE_KEY, 300, function () {
+            try {
+                $stored = Setting::query()->pluck('value', 'key')->all();
+
+                return array_merge($this->defaults(), $stored);
+            } catch (QueryException) {
+                return $this->defaults();
+            }
         });
     }
 
@@ -36,6 +46,10 @@ class SettingsService
 
     public function set(string $key, mixed $value): void
     {
+        if (! $this->tableExists()) {
+            return;
+        }
+
         Setting::query()->updateOrCreate(
             ['key' => $key],
             ['value' => is_bool($value) ? ($value ? '1' : '0') : (string) $value],
@@ -73,5 +87,14 @@ class SettingsService
     public function notifyApplicantOnStatusChange(): bool
     {
         return filter_var($this->get('notify_applicant_on_status_change', '1'), FILTER_VALIDATE_BOOL);
+    }
+
+    private function tableExists(): bool
+    {
+        try {
+            return Schema::hasTable('settings');
+        } catch (QueryException) {
+            return false;
+        }
     }
 }
