@@ -45,6 +45,20 @@ class DeployController extends Controller
         ]);
     }
 
+    public function seed(Request $request): JsonResponse
+    {
+        if ($response = $this->authorizeDeploy($request)) {
+            return $response;
+        }
+
+        Artisan::call('db:seed', ['--force' => true]);
+
+        return response()->json([
+            'status' => 'ok',
+            'output' => trim(Artisan::output()),
+        ]);
+    }
+
     private function authorizeDeploy(Request $request): ?JsonResponse
     {
         $secret = config('app.deploy_secret');

@@ -68,6 +68,14 @@ jobs:
         echo "HTTP status: ${HTTP_CODE}"
 
         if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+          SEED_CODE=$(curl -sS -o /tmp/seed-response.txt -w "%{http_code}" -X POST \
+            -H "${SECRET_HEADER}" \
+            "${DEPLOY_URL}/deploy/seed")
+
+          cat /tmp/seed-response.txt
+          echo ""
+          echo "Seed HTTP status: ${SEED_CODE}"
+
           SETUP_CODE=$(curl -sS -o /tmp/setup-response.txt -w "%{http_code}" -X POST \
             -H "${SECRET_HEADER}" \
             "${DEPLOY_URL}/deploy/setup")

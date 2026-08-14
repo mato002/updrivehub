@@ -12,6 +12,7 @@ echo 'Time: '.date('c')."\n\n";
 
 $checks = [
     'vendor/autoload.php' => $base.'/vendor/autoload.php',
+    'carbon IntervalStep trait' => $base.'/vendor/nesbot/carbon/src/Carbon/Traits/IntervalStep.php',
     '.env' => $base.'/.env',
     'bootstrap/app.php' => $base.'/bootstrap/app.php',
     'storage' => $base.'/storage',

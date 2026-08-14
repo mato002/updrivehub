@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             Route::post('/deploy/setup', [DeployController::class, 'setup'])
                 ->name('deploy.setup');
+
+            Route::post('/deploy/seed', [DeployController::class, 'seed'])
+                ->name('deploy.seed');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
