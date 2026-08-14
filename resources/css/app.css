@@ -97,7 +97,7 @@
     }
 
     .admin-sidebar {
-        @apply fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] -translate-x-full flex-col border-r border-slate-200 bg-slate-900 text-white transition-transform duration-200 lg:static lg:max-w-none lg:translate-x-0;
+        @apply fixed inset-y-0 left-0 z-50 flex h-screen w-64 max-w-[85vw] -translate-x-full flex-col border-r border-slate-200 bg-slate-900 text-white transition-transform duration-200 lg:max-w-none lg:translate-x-0;
     }
 
     .admin-sidebar.open {
@@ -133,7 +133,7 @@
     }
 
     .admin-main {
-        @apply flex min-h-screen min-w-0 flex-1 flex-col lg:ml-0;
+        @apply flex min-h-screen min-w-0 flex-1 flex-col lg:ml-64;
     }
 
     .admin-header {
