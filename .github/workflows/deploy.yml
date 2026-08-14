@@ -54,8 +54,13 @@ jobs:
         fi
 
         DEPLOY_URL="${DEPLOY_URL%/}"
+        SECRET_HEADER="X-Deploy-Secret: ${DEPLOY_SECRET}"
+
+        curl -sS -X POST -H "${SECRET_HEADER}" "${DEPLOY_URL}/fix-storage.php"
+        echo ""
+
         HTTP_CODE=$(curl -sS -o /tmp/migrate-response.txt -w "%{http_code}" -X POST \
-          -H "X-Deploy-Secret: ${DEPLOY_SECRET}" \
+          -H "${SECRET_HEADER}" \
           "${DEPLOY_URL}/deploy/migrate")
 
         cat /tmp/migrate-response.txt
@@ -63,6 +68,13 @@ jobs:
         echo "HTTP status: ${HTTP_CODE}"
 
         if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+          SETUP_CODE=$(curl -sS -o /tmp/setup-response.txt -w "%{http_code}" -X POST \
+            -H "${SECRET_HEADER}" \
+            "${DEPLOY_URL}/deploy/setup")
+
+          cat /tmp/setup-response.txt
+          echo ""
+          echo "Setup HTTP status: ${SETUP_CODE}"
           exit 0
         fi
 

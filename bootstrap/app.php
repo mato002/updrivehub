@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             Route::post('/deploy/migrate', [DeployController::class, 'migrate'])
                 ->name('deploy.migrate');
+
+            Route::post('/deploy/setup', [DeployController::class, 'setup'])
+                ->name('deploy.setup');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
