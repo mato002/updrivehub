@@ -5,15 +5,40 @@
 @section('page-subtitle', 'Manage admin users, roles, and access')
 
 @section('content')
-    <div class="mb-6 flex justify-end">
+    <div class="mb-4 flex justify-end sm:mb-6">
         @permission('users.manage')
-            <a href="{{ route('admin.users.create') }}" class="btn-primary">
+            <a href="{{ route('admin.users.create') }}" class="btn-primary w-full sm:w-auto">
                 <i class="fa-solid fa-user-plus mr-1.5"></i> Add Team Member
             </a>
         @endpermission
     </div>
 
-    <div class="admin-table-wrap">
+    <div class="mb-4 space-y-3 lg:hidden">
+        @foreach($users as $user)
+            <article class="admin-mobile-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="font-semibold text-slate-900">{{ $user->name }}</p>
+                        <p class="truncate text-sm text-slate-500">{{ $user->email }}</p>
+                    </div>
+                    <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                        {{ $user->is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+                <div class="mt-3 flex items-center justify-between gap-3">
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{{ $user->roleLabel() }}</span>
+                    @permission('users.manage')
+                        <a href="{{ route('admin.users.edit', $user) }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Edit</a>
+                    @endpermission
+                </div>
+            </article>
+        @endforeach
+        @if($users->hasPages())
+            <div class="pt-2">{{ $users->links() }}</div>
+        @endif
+    </div>
+
+    <div class="admin-table-wrap hidden lg:block">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50">

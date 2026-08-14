@@ -33,11 +33,11 @@
 
 @layer components {
     .btn-primary {
-        @apply inline-flex items-center justify-center rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:py-3;
     }
 
     .btn-secondary {
-        @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+        @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 sm:px-6 sm:py-3;
     }
 
     .form-input {
@@ -141,7 +141,15 @@
     }
 
     .admin-header-inner {
-        @apply flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between;
+        @apply flex flex-col gap-3;
+    }
+
+    .admin-header-top {
+        @apply flex items-center justify-between gap-3;
+    }
+
+    .admin-header-title {
+        @apply min-w-0 lg:pr-4;
     }
 
     .admin-header-left {
@@ -149,7 +157,7 @@
     }
 
     .admin-header-actions {
-        @apply flex flex-wrap items-center gap-2 sm:justify-end;
+        @apply flex shrink-0 flex-wrap items-center justify-end gap-2;
     }
 
     .admin-mobile-menu-btn {
@@ -173,11 +181,11 @@
     }
 
     .admin-profile-wrap {
-        @apply relative ml-auto sm:ml-0;
+        @apply relative;
     }
 
     .admin-profile-btn {
-        @apply flex max-w-[220px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:max-w-none sm:px-3;
+        @apply flex max-w-[52px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-left shadow-sm transition hover:border-slate-300 hover:bg-slate-50 md:max-w-none md:px-3;
     }
 
     .admin-profile-avatar {
@@ -210,6 +218,42 @@
 
     .admin-stat-card {
         @apply rounded-2xl border border-slate-200 bg-white p-5 shadow-sm;
+    }
+
+    .admin-stat-card-compact {
+        @apply p-3 sm:p-5;
+    }
+
+    .admin-mobile-card {
+        @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm;
+    }
+
+    .admin-filter-chip {
+        @apply inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-800;
+    }
+
+    .admin-modal {
+        @apply fixed inset-0 z-[60] flex items-end justify-center p-0 sm:items-center sm:p-4;
+    }
+
+    .admin-modal-backdrop {
+        @apply absolute inset-0 bg-slate-900/50 backdrop-blur-sm;
+    }
+
+    .admin-modal-panel {
+        @apply relative z-10 flex max-h-[92vh] w-full flex-col rounded-t-2xl border border-slate-200 bg-white shadow-2xl sm:max-w-lg sm:rounded-2xl;
+    }
+
+    .admin-modal-header {
+        @apply flex shrink-0 items-center justify-between border-b border-slate-200 px-5 py-4;
+    }
+
+    .admin-modal-close {
+        @apply flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700;
+    }
+
+    .admin-modal-body {
+        @apply overflow-y-auto px-5 py-4;
     }
 
     .admin-table-wrap {

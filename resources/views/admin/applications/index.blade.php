@@ -5,53 +5,67 @@
 @section('page-subtitle', 'Search, filter, export, and manage driver applications')
 
 @section('content')
-    {{-- Filters --}}
-    <div class="admin-stat-card mb-6">
-        <form method="GET" action="{{ route('admin.applications.index') }}" class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            <div class="xl:col-span-2">
-                <label class="form-label">Search</label>
-                <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Name, email, phone, reference..." class="form-input">
-            </div>
-            <div>
-                <label class="form-label">Status</label>
-                <select name="status" class="form-input">
-                    <option value="">All statuses</option>
-                    @foreach($statuses as $key => $meta)
-                        <option value="{{ $key }}" @selected(($filters['status'] ?? '') === $key)>{{ $meta['label'] }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">County</label>
-                <select name="county" class="form-input">
-                    <option value="">All counties</option>
-                    @foreach($counties as $county)
-                        <option value="{{ $county }}" @selected(($filters['county'] ?? '') === $county)>{{ $county }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="form-label">From</label>
-                    <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="form-input">
-                </div>
-                <div>
-                    <label class="form-label">To</label>
-                    <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="form-input">
-                </div>
-            </div>
-            <div class="flex flex-wrap items-end gap-2 md:col-span-2 xl:col-span-5">
-                <button type="submit" class="btn-primary w-full sm:w-auto">
-                    <i class="fa-solid fa-filter mr-1.5"></i> Apply Filters
+    @php
+        $activeFilterCount = collect($filters ?? [])->filter(fn ($value) => filled($value))->count();
+    @endphp
+
+    {{-- Mobile toolbar --}}
+    <div class="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
+        <button type="button" id="filter-modal-open" class="btn-primary flex-1 sm:flex-none">
+            <i class="fa-solid fa-filter mr-1.5"></i>
+            Filters
+            @if ($activeFilterCount > 0)
+                <span class="ml-1.5 rounded-full bg-white/20 px-2 py-0.5 text-xs">{{ $activeFilterCount }}</span>
+            @endif
+        </button>
+        @if ($activeFilterCount > 0)
+            <a href="{{ route('admin.applications.index') }}" class="btn-secondary">Clear</a>
+        @endif
+        @permission('applications.export')
+            <a href="{{ route('admin.applications.export', $filters) }}" class="btn-secondary">
+                <i class="fa-solid fa-file-csv"></i>
+            </a>
+        @endpermission
+    </div>
+
+    @if ($activeFilterCount > 0)
+        <div class="mb-4 flex flex-wrap gap-2 lg:hidden">
+            @if (filled($filters['search'] ?? null))
+                <span class="admin-filter-chip">Search: {{ $filters['search'] }}</span>
+            @endif
+            @if (filled($filters['status'] ?? null))
+                <span class="admin-filter-chip">Status: {{ $statuses[$filters['status']]['label'] ?? $filters['status'] }}</span>
+            @endif
+            @if (filled($filters['county'] ?? null))
+                <span class="admin-filter-chip">County: {{ $filters['county'] }}</span>
+            @endif
+            @if (filled($filters['date_from'] ?? null) || filled($filters['date_to'] ?? null))
+                <span class="admin-filter-chip">
+                    Dates: {{ $filters['date_from'] ?? '…' }} – {{ $filters['date_to'] ?? '…' }}
+                </span>
+            @endif
+        </div>
+    @endif
+
+    {{-- Desktop filters --}}
+    <div class="admin-stat-card mb-6 hidden lg:block">
+        @include('admin.applications._filters-form', ['formId' => 'applications-filter-form-desktop'])
+    </div>
+
+    {{-- Mobile filter modal --}}
+    <div id="filter-modal" class="admin-modal hidden" aria-hidden="true">
+        <div id="filter-modal-backdrop" class="admin-modal-backdrop"></div>
+        <div class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="filter-modal-title">
+            <div class="admin-modal-header">
+                <h2 id="filter-modal-title" class="text-lg font-bold text-slate-900">Filter Applications</h2>
+                <button type="button" id="filter-modal-close" class="admin-modal-close" aria-label="Close filters">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
-                <a href="{{ route('admin.applications.index') }}" class="btn-secondary w-full sm:w-auto">Clear</a>
-                @permission('applications.export')
-                    <a href="{{ route('admin.applications.export', $filters) }}" class="btn-secondary w-full sm:w-auto">
-                        <i class="fa-solid fa-file-csv mr-1.5"></i> Export CSV
-                    </a>
-                @endpermission
             </div>
-        </form>
+            <div class="admin-modal-body">
+                @include('admin.applications._filters-form', ['formId' => 'applications-filter-form-mobile'])
+            </div>
+        </div>
     </div>
 
     @permission('applications.bulk')
@@ -63,8 +77,8 @@
                 @endif
             @endforeach
             <div id="bulk-hidden-inputs"></div>
-            <div class="flex flex-wrap items-end gap-3">
-                <div class="min-w-[200px] flex-1">
+            <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                <div class="min-w-0 flex-1 sm:min-w-[200px]">
                     <label class="form-label">Bulk status update</label>
                     <select name="status" class="form-input" required>
                         @foreach($statuses as $key => $meta)
@@ -79,8 +93,57 @@
         </form>
     @endpermission
 
-    {{-- Table --}}
-    <div class="admin-table-wrap">
+    {{-- Mobile card list --}}
+    <div class="mb-4 space-y-3 lg:hidden">
+        <p class="text-sm text-slate-600">
+            Showing {{ $applications->firstItem() ?? 0 }}–{{ $applications->lastItem() ?? 0 }} of {{ $applications->total() }} applications
+        </p>
+        @forelse($applications as $application)
+            <article class="admin-mobile-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        @permission('applications.bulk')
+                            <label class="mb-2 flex items-center gap-2 text-xs text-slate-500">
+                                <input type="checkbox" value="{{ $application->id }}" class="row-checkbox rounded border-slate-300">
+                                Select
+                            </label>
+                        @endpermission
+                        <p class="font-mono text-xs font-semibold text-brand-700">{{ $application->reference_number }}</p>
+                        <p class="mt-1 font-semibold text-slate-900">{{ $application->full_name }}</p>
+                        <p class="text-xs text-slate-500">{{ $application->email }}</p>
+                    </div>
+                    <x-admin.status-badge :status="$application->status" />
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-600">
+                    <div class="rounded-lg bg-slate-50 px-3 py-2">
+                        <p class="text-slate-400">County</p>
+                        <p class="font-medium text-slate-800">{{ $application->county }}</p>
+                    </div>
+                    <div class="rounded-lg bg-slate-50 px-3 py-2">
+                        <p class="text-slate-400">Experience</p>
+                        <p class="font-medium text-slate-800">{{ $application->years_of_experience }} yrs</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between gap-3">
+                    <p class="text-xs text-slate-500">{{ $application->created_at->format('M j, Y g:i A') }}</p>
+                    <a href="{{ route('admin.applications.show', $application) }}" class="inline-flex items-center gap-1 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100">
+                        <i class="fa-solid fa-eye"></i> View
+                    </a>
+                </div>
+            </article>
+        @empty
+            <div class="admin-mobile-card py-10 text-center">
+                <i class="fa-solid fa-inbox text-3xl text-slate-300"></i>
+                <p class="mt-3 text-slate-500">No applications found matching your filters.</p>
+            </div>
+        @endforelse
+        @if ($applications->hasPages())
+            <div class="pt-2">{{ $applications->links() }}</div>
+        @endif
+    </div>
+
+    {{-- Desktop table --}}
+    <div class="admin-table-wrap hidden lg:block">
         <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
             <p class="text-sm text-slate-600">
                 Showing {{ $applications->firstItem() ?? 0 }}–{{ $applications->lastItem() ?? 0 }} of {{ $applications->total() }} applications
@@ -149,6 +212,37 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const filterModal = document.getElementById('filter-modal');
+        const filterModalOpen = document.getElementById('filter-modal-open');
+        const filterModalClose = document.getElementById('filter-modal-close');
+        const filterModalBackdrop = document.getElementById('filter-modal-backdrop');
+
+        const openFilterModal = () => {
+            filterModal?.classList.remove('hidden');
+            filterModal?.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('overflow-hidden');
+        };
+
+        const closeFilterModal = () => {
+            filterModal?.classList.add('hidden');
+            filterModal?.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        filterModalOpen?.addEventListener('click', openFilterModal);
+        filterModalClose?.addEventListener('click', closeFilterModal);
+        filterModalBackdrop?.addEventListener('click', closeFilterModal);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !filterModal?.classList.contains('hidden')) {
+                closeFilterModal();
+            }
+        });
+    </script>
+@endpush
 
 @permission('applications.bulk')
     @push('scripts')
