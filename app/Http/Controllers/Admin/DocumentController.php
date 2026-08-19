@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ActivityLogger;
 use App\Services\DocumentStorageService;
 use App\Models\DriverApplication;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentController extends Controller
@@ -16,7 +16,7 @@ class DocumentController extends Controller
         string $document,
         DocumentStorageService $documentStorage,
         ActivityLogger $activityLogger,
-    ): Response|StreamedResponse {
+    ): BinaryFileResponse {
         $path = $application->pathForDocument($document);
 
         if (! $path || ! $documentStorage->exists($path)) {
