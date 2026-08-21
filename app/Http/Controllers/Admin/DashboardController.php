@@ -18,10 +18,12 @@ class DashboardController extends Controller
             'today' => DriverApplication::whereDate('created_at', today())->count(),
             'this_week' => DriverApplication::where('created_at', '>=', now()->startOfWeek())->count(),
             'pending' => DriverApplication::where('status', 'submitted')->count(),
-            'avg_review_days' => (int) DriverApplication::query()
-                ->whereNotNull('reviewed_at')
-                ->selectRaw('AVG(DATEDIFF(reviewed_at, created_at)) as avg_days')
-                ->value('avg_days'),
+            'avg_review_days' => (int) round(
+                DriverApplication::query()
+                    ->whereNotNull('reviewed_at')
+                    ->get(['created_at', 'reviewed_at'])
+                    ->avg(fn ($application) => $application->created_at->diffInDays($application->reviewed_at)) ?? 0
+            ),
         ];
 
         $byStatus = collect($statuses)->mapWithKeys(function (array $meta, string $key) {

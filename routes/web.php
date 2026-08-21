@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\PasswordResetController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DriverApplicationController;
@@ -82,5 +85,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('settings', [SettingsController::class, 'update'])
             ->middleware('permission:settings.manage')
             ->name('settings.update');
+
+        Route::get('reports', [ReportsController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('reports.index');
+
+        Route::get('activity', [ActivityLogController::class, 'index'])
+            ->middleware('permission:activity.view')
+            ->name('activity.index');
+
+        Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
     });
 });

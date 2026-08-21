@@ -116,6 +116,10 @@
         @apply flex-1 overflow-y-auto px-3 py-4;
     }
 
+    .admin-sidebar-section-label {
+        @apply px-4 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500;
+    }
+
     .admin-sidebar-footer {
         @apply shrink-0 border-t border-white/10 p-3;
     }

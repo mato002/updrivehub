@@ -25,6 +25,7 @@ class RolePermissions
             'settings.view',
             'settings.manage',
             'reports.view',
+            'activity.view',
         ],
         'recruiter' => [
             'dashboard.view',
@@ -34,12 +35,14 @@ class RolePermissions
             'applications.bulk',
             'documents.view',
             'reports.view',
+            'activity.view',
         ],
         'viewer' => [
             'dashboard.view',
             'applications.view',
             'documents.view',
             'reports.view',
+            'activity.view',
         ],
     ];
 

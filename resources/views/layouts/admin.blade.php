@@ -18,6 +18,9 @@
             request()->routeIs('admin.dashboard') => 'Dashboard',
             request()->routeIs('admin.applications.index') => 'Applications',
             request()->routeIs('admin.applications.show') => 'Application detail',
+            request()->routeIs('admin.reports.*') => 'Reports',
+            request()->routeIs('admin.activity.*') => 'Activity Log',
+            request()->routeIs('admin.profile.*') => 'My Profile',
             request()->routeIs('admin.users.create') => 'Team / Add member',
             request()->routeIs('admin.users.edit') => 'Team / Edit member',
             request()->routeIs('admin.users.*') => 'Team',
@@ -40,14 +43,31 @@
             </div>
 
             <nav class="admin-sidebar-nav space-y-1">
+                <p class="admin-sidebar-section-label">Main</p>
                 <a href="{{ route('admin.dashboard') }}" class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-gauge-high w-5 text-center"></i>
                     Dashboard
                 </a>
-                <a href="{{ route('admin.applications.index') }}" class="admin-nav-link {{ request()->routeIs('admin.applications.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-folder-open w-5 text-center"></i>
-                    Applications
-                </a>
+                @permission('applications.view')
+                    <a href="{{ route('admin.applications.index') }}" class="admin-nav-link {{ request()->routeIs('admin.applications.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-folder-open w-5 text-center"></i>
+                        Applications
+                    </a>
+                @endpermission
+                @permission('reports.view')
+                    <a href="{{ route('admin.reports.index') }}" class="admin-nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                        Reports
+                    </a>
+                @endpermission
+                @permission('activity.view')
+                    <a href="{{ route('admin.activity.index') }}" class="admin-nav-link {{ request()->routeIs('admin.activity.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
+                        Activity Log
+                    </a>
+                @endpermission
+
+                <p class="admin-sidebar-section-label mt-4">Management</p>
                 @permission('users.view')
                     <a href="{{ route('admin.users.index') }}" class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                         <i class="fa-solid fa-users-gear w-5 text-center"></i>
@@ -60,6 +80,16 @@
                         Settings
                     </a>
                 @endpermission
+
+                <p class="admin-sidebar-section-label mt-4">Account</p>
+                <a href="{{ route('admin.profile.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user w-5 text-center"></i>
+                    My Profile
+                </a>
+                <a href="{{ route('info') }}" target="_blank" rel="noopener noreferrer" class="admin-nav-link">
+                    <i class="fa-solid fa-circle-info w-5 text-center"></i>
+                    Public Info Page
+                </a>
             </nav>
 
             <div class="admin-sidebar-footer">
@@ -133,10 +163,16 @@
                                         Settings
                                     </a>
                                 @endpermission
-                                <a href="{{ route('admin.applications.index') }}" class="admin-profile-menu-item" role="menuitem">
-                                    <i class="fa-solid fa-folder-open w-4 text-center text-slate-400"></i>
-                                    Applications
+                                <a href="{{ route('admin.profile.edit') }}" class="admin-profile-menu-item" role="menuitem">
+                                    <i class="fa-solid fa-user w-4 text-center text-slate-400"></i>
+                                    My Profile
                                 </a>
+                                @permission('applications.view')
+                                    <a href="{{ route('admin.applications.index') }}" class="admin-profile-menu-item" role="menuitem">
+                                        <i class="fa-solid fa-folder-open w-4 text-center text-slate-400"></i>
+                                        Applications
+                                    </a>
+                                @endpermission
                                 <div class="border-t border-slate-100">
                                     <form action="{{ route('admin.logout') }}" method="POST">
                                         @csrf
